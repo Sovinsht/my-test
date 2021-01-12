@@ -47,7 +47,7 @@ router.post('/signin', async(req,res) =>{
      
 
     }else{
-      res.send(dd"Incorrect password Details");
+      res.send("Incorrect password Details");
     }
 
  }catch(error) {
@@ -172,7 +172,7 @@ router.post('/resetpassword/:token', function(req, res){
   async.waterfall([
     function(done){
     
-      Register.findOne({resetPasswordToken: req.params.token, resetPasswordExpires:{$gte: Date.now()} }, function(err, user) {
+      Register.findOne({resetPasswordToken: req.params.token, resetPasswordExpires:{$gt: Date.now()} }, function(err, user) {
 
         if(!user){
           console.log('Password reset token is invalid or expired');
@@ -183,8 +183,8 @@ router.post('/resetpassword/:token', function(req, res){
        if(req.body.password === req.body.confirm_password){
          user.setPassword(req.body.password, function(err){
           
-           user.resetPasswordToken = token;
-           user.resetPasswordExpires = Date.now() + 3600000; //1 hr
+           user.resetPasswordToken = undefined;
+           user.resetPasswordExpires = undefined;
 
              user.save(function(err){
              req.signin(user, function(err){
@@ -266,13 +266,15 @@ router.post('/project', async(req, res) =>{
 
 //user.edit_activity
 
-router.get('/edit-activity', function(req, res){
+router.get('/edit-activity/:id', function(req, res){
   ProjectData.exec(function(err, pdata){
     if(err) throw err;
     res.render('edit-activity', {p_records: pdata});
   })
   
 });
+
+
 
 //user.activity
 
@@ -309,6 +311,9 @@ router.post('/user', async(req, res) =>{
    }
  });
 
+ 
+
+ 
  
 
  //logout
