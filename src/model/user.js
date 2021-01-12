@@ -1,20 +1,76 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt-nodejs');
+const Schema = mongoose.Schema;
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
-const { Schema } = mongoose;
+//create schema
+const userModel = new Schema({
+  name: {
+    type: String,
+    required: true
+  },
 
-const userSchema = new Schema({
-  username: String,
-  email: String,
-  password: String
-});
+    password: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        unique: true,
+        sparse: true,
+        lowercase: true
+    },
+    confirmpassword: {
+      type: String,
+      required: true
+    },
+    // resetLink: {
+    //   data: String,
+    //   default: ''
+    resetPasswordToken: String,
 
-userSchema.methods.encryptPassword = (password) => {
-  return bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-};
+    resetPasswordExpires: Date ,
+    
+    tokens:[{
+      token:{
+        type: String,
+        required: true
+      }
+    }]
 
-userSchema.methods.comparePassword= function (password) {
-  return bcrypt.compareSync(password, this.password);
-};
+    
+   }, {timestamps: true}
+   ) 
 
-module.exports = mongoose.model('user', userSchema);
+//generating token
+
+userModel.methods.generateAuthToken = async function(){
+  try{
+    console.log(this_id);
+    const token = jwt.sign({ _id:this_id.toString()}, "thisisherdinternationalregisterpage");
+    this.tokens = this.tokens.concat({token:token});
+    await this.save();
+    return token;
+
+  }catch(error){
+    res.send("the error part" + error);
+    console.log("the error part" + error);
+  }
+}
+
+//converting password into hash
+
+userModel.pre("save", async function(next){
+  if(this.isModified("password")){
+    this.password = await bcrypt.hash(this.password, 10);
+    this.confirmpassword = await bcrypt.hash(this.confirmpassword, 10);
+  }
+  next();
+})
+
+//create model
+const Register = new mongoose.model('Register', userModel);
+
+
+//export the model
+module.exports = Register;

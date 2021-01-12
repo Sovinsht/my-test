@@ -255,7 +255,7 @@ body {
 .signup-content {
   padding: 75px 0; }
 
-.signup-form, .signup-image, .signin-form, .signin-image {
+.signup-form, .signup-image, .signin-form, .signin-image, .reset-form {
   width: 50%;
   overflow: hidden; }
 
@@ -509,6 +509,10 @@ label.valid {
 .signin-form {
   margin-right: 90px;
   margin-left: 80px; }
+
+.reset-form {
+    margin-right: 90px;
+    margin-left: 80px; }
 
 .signin-image {
   margin-left: 110px;
