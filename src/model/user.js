@@ -24,6 +24,7 @@ const userModel = new Schema({
       type: String,
       required: true
     },
+    
     // resetLink: {
     //   data: String,
     //   default: ''

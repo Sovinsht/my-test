@@ -5,6 +5,8 @@ const Schema = mongoose.Schema;
 
 //create schema
 const activityModel = new Schema({
+  
+
     key_activities: {
     type: String,
     required: true

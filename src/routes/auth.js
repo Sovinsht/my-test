@@ -5,15 +5,25 @@ const Activity = require('../model/activity');
 const Project = require('../model/project');
 //var activityController= require('../controllers/fetch_data');
 const ActivityData = Activity.find({});
-const ProjectData = Project.find({});
+const ProjectData = Project.find({status:'Enable'});
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const async = require('async');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
-// const mailgun = require('mailgun-js');
-// const DOMAIN = 'sandboxf26a5c38b52e4da68cd059e6c4d2daba.mailgun.org';
-// const mg = mailgun({apiKey: '082cbb13fb71991e40fc40ab5b481569-f135b0f1-00dda17b', domain: DOMAIN});
+const { post } = require('../app');
+// const ExcelJs = require('exceljs');
+require('core-js/modules/es.promise');
+require('core-js/modules/es.string.includes');
+require('core-js/modules/es.object.assign');
+require('core-js/modules/es.object.keys');
+require('core-js/modules/es.symbol');
+require('core-js/modules/es.symbol.async-iterator');
+require('regenerator-runtime/runtime');
+const ExcelJs = require('exceljs/dist/es5');
+const moment = require('moment');
+
+
 require('dotenv').config();
 require('../app');
 //const alert = require('alert')
@@ -23,7 +33,7 @@ require('../app');
 
 //ROute home
 router.get('/', function(req,res) {
-  res.render('signin');
+  res.render('home');
 })
 
 
@@ -146,7 +156,7 @@ router.post('/forgetpassword', function(req, res, next){
         console.log('mail sent');
         req.flash('success', 'An email is sent to' + user.email + 'Kindly follow the instruction');
         done(err, 'done');
-      });
+      }); 
 
     }
   ], function(err){
@@ -230,7 +240,7 @@ router.post('/resetpassword/:token', function(req, res){
 router.get('/index', function(req, res) {
   ActivityData.exec(function(err, data){
     if(err) throw err;
-    res.render('dashboard', {records: data});
+    res.render('dashboard', {records: data, p_records:data});
   })
   
 });
@@ -266,27 +276,35 @@ router.post('/project', async(req, res) =>{
 
 //user.edit_activity
 
-router.get('/edit-activity/:id', function(req, res){
-  ProjectData.exec(function(err, pdata){
-    if(err) throw err;
-    res.render('edit-activity', {p_records: pdata});
-  })
+// router.get('/edit', function(req, res){
+//    ProjectData.exec(function(err, pdata){
+//     if(err) throw err;
+//     res.render('edit-activity', {p_records: pdata });
+//   })
   
-});
+  
+// });
+
+// //user. delete_activity
+
+// router.get('/delete', function(req, res){
+
+//   res.render("delete");
+// });
 
 
 
 //user.activity
 
-router.get('/user', function(req,res){
+router.get('/activity', function(req,res){
   ProjectData.exec(function(err, pdata){
     if(err) throw err;
-    res.render('user', {p_records: pdata});
+    res.render('activity', {p_records: pdata});
   })
   
 })
 
-router.post('/user', async(req, res) =>{
+router.post('/activity', async(req, res) =>{
  try{
   const activityReport = new Activity({
       key_activities: req.body.key_activities,
@@ -312,7 +330,43 @@ router.post('/user', async(req, res) =>{
  });
 
  
+ router.get('/generate', async(req, res) => {
+   const startDate = moment(req.body.fromDate).startOf('month').toDate();
+   console.log(startDate);
+   const endDate = moment(req.body.toDate).endOf('month').toDate();
+   console.log(endDate);
+   try{
+     const activities = await Activity.find({created_at: {$gte: startDate, $lte: endDate}});
+     const workbook = new ExcelJs.Workbook();
+     const worksheet = workbook.addWorksheet('Activity Report');
+     worksheet.columns = [
+       {header:'S.No.', key:'s_no', width:5},
+       {header:'Key Activities', key:'key_activities', width:15},
+       {header:'Team Members', key:'team_member', width:15},
+       {header:'Project', key:'project', width:10},
+       {header:'Activity Completion Status', key:'activity_completion_status', width:25},
+       {header:'Remarks', key:'remarks', width:30}
+      ];
+      let count = 1;
+      activities.forEach(activity => {
+        (activity).s_no = count;
+        worksheet.addRow(activity);
+        count += 1;
+    });
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.font = {bold: true};
+      });
+    const data = await workbook.xlsx.writeFile('activity.xlsx')
+       res.send('done');
+    
 
+   }catch(err){
+     console.log('generate error',err);
+     res.status(500).send(err);
+
+   }
+
+ })
  
  
 
@@ -323,6 +377,88 @@ router.post('/user', async(req, res) =>{
   res.redirect('/signin');
   
 });
+
+//
+// router.get('/', (req, res, next) =>{
+//   console.log(req.params.id);
+//   Activity.find()
+//   .then(result=> {
+//     res.status(200).json({
+//       activity: result
+//     })
+//   })
+//   .catch(err=>{
+//     console.log(err);
+//     res.status(500).json({
+//       error: err
+//     })
+//   });
+
+// });
+
+//id
+// router.param('/id', (req, res, next, id) =>{
+//   console.log(req.params.id);
+//   Activity.findById(id, function(err, result){
+//     if(err) {
+//       res.json(err);
+//     }else{
+//       req.activityId = result;
+//       next();
+
+//       }
+//     })   
+//   })
+
+
+//update
+// router.get('/edit/:id', (req, res)=> {
+//   console.log(req.params.id);
+//   Activity.findById(req.params.id, function(err, activity){
+//     if(err){
+//       console.log(err);
+
+//     } else {
+//       console.log(activity);
+//       res.redirect('edit-activity', {activities: activity})
+//     }
+
+//   });
+    
+//  });
+
+ router.post('/edit/:id', function(req, res){
+   console.log("id"+ req.params.id);
+   const mybodydata = {
+    key_activities: req.body.key_activities,
+    project: req.body.project,
+    team_member: req.body.team_member,
+    activity_completion_status: req.body.activity_completion_status,
+    remarks: req.body.remarks
+   }
+
+   Activity.findByIdAndUpdate(req.params.id, mybodydata, function(err){
+     if(err){
+       res.redirect('edit-activity' + req.params.id);
+     } else {
+       res.redirect('index');
+     }
+   })
+ })
+
+    router.delete('/report', function(req, res){
+        const delete1 = req.body.id
+        console.log(delete1)
+        
+        Activity.findByIdAndRemove({_id: delete1}, 
+           function(err, docs){
+        if(err) res.json(err);
+        else    res.redirect('/index');
+        });
+        });
+     
+
+
 
 
 

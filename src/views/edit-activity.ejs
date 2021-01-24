@@ -38,7 +38,7 @@ The above copyright notice and this permission notice shall be included in all c
 
         Tip 2: you can also add an image using data-image tag
     -->
-      <div class="logo"><a href="http://www.herdint.com" class="simple-text logo-normal">
+      <div class="logo"><a href="index" class="simple-text logo-normal">
           Herd International
         </a></div>
       <div class="sidebar-wrapper">
@@ -134,18 +134,18 @@ The above copyright notice and this permission notice shall be included in all c
                   <p class="card-category">Update your Weekly Activities Report</p>
                 </div>
                 <div class="card-body">
-                  <form action="/user" method="POST" class="activity-form" id="activity-form">
+                  <form action="/edit" method="POST" class="activity-form" id="activity-form">
                     <div class="row">
                       <div class="col-md-6">
                         <div class="form-group">
                           <label class="bmd-label-floating">Key Activities</label>
-                          <input type="text" name="key_activities" class="form-control" required >
+                          <input type="text" name="key_activities" class="form-control" value="<%= activities.key_activities %>" required >
                         </div>
                       </div>
                       <div class="col-md-6">
                         <div class="form-group">
                           <label class="bmd-label-floating">Project</label>
-                          <select name="project" class="custom-select my-select">
+                          <select  name="project" class="custom-select my-select">
                             <option>Choose..</option>
                             <% p_records.forEach(function(rows){ %>
                               
@@ -161,13 +161,13 @@ The above copyright notice and this permission notice shall be included in all c
                       <div class="col-md-6">
                         <div class="form-group">
                           <label class="bmd-label-floating">Support Team Member</label>
-                         <input type="text" name="team_member" rows="3" class="form-control"  required>
+                         <input type="text" name="team_member" rows="3" class="form-control" value="<%= activities.team_member %>"  required>
                         </div>
                       </div>
                       <div class="col-md-6">
                         <div class="form-group">
                           <label  class="bmd-label-floating">Activity Completion Status</label>
-                      <select name="activity_completion_status" class="custom-select my-select">
+                      <select name="activity_completion_status" value="<%= activities.activity_completion_status %>" class="custom-select my-select">
                         <option>Choose..</option>
                         <option>Fully</option>
                         <option>Partially</option>
@@ -213,7 +213,7 @@ The above copyright notice and this permission notice shall be included in all c
                           <label>Remarks</label>
                           <div class="form-group">
                             <label class="bmd-label-floating"> </label>
-                            <textarea class="form-control" name="remarks" rows="5"></textarea>
+                            <textarea class="form-control" value="<%= activities.remarks %>" name="remarks" rows="5"></textarea>
                           </div>
                         </div>
                       </div>
