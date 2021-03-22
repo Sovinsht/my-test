@@ -6,7 +6,7 @@ var morgan = require('morgan');
 var session = require('express-session');
 require('dotenv').config();
 const flash = require('connect-flash');
-// const flash = require('connect-flash');
+
 
 
 require('./configs/db.config');
@@ -26,6 +26,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(flash());
 app.use(express.static(path.join(__dirname + '/public/stylesheets')));
 app.use(express.static(path.join(__dirname + '/public/javascripts')));

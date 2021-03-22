@@ -44,19 +44,19 @@ The above copyright notice and this permission notice shall be included in all c
       <div class="sidebar-wrapper">
         <ul class="nav">
           <li class="nav-item  ">
-            <a class="nav-link" href="index">
+            <a class="nav-link" href="http://localhost:5000/index">
               <i class="material-icons">dashboard</i>
               <p>Dashboard</p>
             </a>
           </li>
           <li class="nav-item  ">
-            <a class="nav-link" href="project">
+            <a class="nav-link" href="http://localhost:5000/project">
               <i class="material-icons">project</i>
               <p>Project </p>
             </a>
           </li>
           <li class="nav-item active ">
-            <a class="nav-link" href="user">
+            <a class="nav-link" href="#">
               <i class="material-icons">report</i>
               <p>Weekly Report Update</p>
             </a>
@@ -134,7 +134,7 @@ The above copyright notice and this permission notice shall be included in all c
                   <p class="card-category">Update your Weekly Activities Report</p>
                 </div>
                 <div class="card-body">
-                  <form action="/edit" method="POST" class="activity-form" id="activity-form">
+                  <form action="/editA/<%= activities.id %>" method="POST" class="activity-form" id="activity-form">
                     <div class="row">
                       <div class="col-md-6">
                         <div class="form-group">
@@ -149,7 +149,7 @@ The above copyright notice and this permission notice shall be included in all c
                             <option>Choose..</option>
                             <% p_records.forEach(function(rows){ %>
                               
-                            <option value="<%= rows.project %>"><%= rows.project %></option>
+                            <option value="<%= rows.project %>" > <%= rows.project %></option>
                             <% }); %>
                         </select>
                       
@@ -167,14 +167,15 @@ The above copyright notice and this permission notice shall be included in all c
                       <div class="col-md-6">
                         <div class="form-group">
                           <label  class="bmd-label-floating">Activity Completion Status</label>
-                      <select name="activity_completion_status" value="<%= activities.activity_completion_status %>" class="custom-select my-select">
-                        <option>Choose..</option>
-                        <option>Fully</option>
-                        <option>Partially</option>
-                        <option>Incomplete</option>
-                        <option>No Longer Required</option>
-                        <option>Not Started</option>
-                      
+                      <select name="activity_completion_status"  class="custom-select my-select">
+                        
+                        <option >Choose..</option>
+                        <option value="Fully" <% if( activities.activity_completion_status == "Fully"){ %> selected <% } %>>Fully</option>
+                        <option value="Partially"  <% if( activities.activity_completion_status == "Partially"){ %> selected <% } %>>Partially</option>
+                        <option value="Incomplete"  <% if( activities.activity_completion_status == "Incomplete"){ %> selected <% } %>>Incomplete</option>
+                        <option value="No Longer Required"  <% if( activities.activity_completion_status == "No Longer Required"){ %> selected <% } %>>No Longer Required</option>
+                        <option value="Not Started"  <% if( activities.activity_completion_status == "Not Started"){ %> selected <% } %>>Not Started</option>
+                      <%= console.log(activities.activity_completion_status) %>
                       </select>
                         </div>
                       </div>
@@ -213,7 +214,8 @@ The above copyright notice and this permission notice shall be included in all c
                           <label>Remarks</label>
                           <div class="form-group">
                             <label class="bmd-label-floating"> </label>
-                            <textarea class="form-control" value="<%= activities.remarks %>" name="remarks" rows="5"></textarea>
+                            <input type="text" name="remarks" rows="3" class="form-control" value="<%= activities.remarks %>"  required>
+                            
                           </div>
                         </div>
                       </div>

@@ -24,6 +24,11 @@ const userModel = new Schema({
       type: String,
       required: true
     },
+    role:{
+        type: String,
+        default: "employee",
+        enum: ["employee","admin","supervisor","HR"]
+    },
     
     // resetLink: {
     //   data: String,

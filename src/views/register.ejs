@@ -9,12 +9,16 @@
 
     <!-- Font Icon -->
     <link rel="stylesheet" href="/fonts/material-icon/css/material-design-iconic-font.min.css">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+  <!-- CSS Files -->
+  <link href="../assets/css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
 
     <!-- Main css -->
     <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
 <body>
-
+   
     <div class="main">
 
         <!-- Sign up form -->
@@ -23,8 +27,9 @@
                 <div class="signup-content">
                     <div class="signup-form">
                         <h2 class="form-title">Sign up</h2>
+                       
                         <form action="/register" method="POST" class="register-form" id="register-form">
-                            
+                           
                             <div class="form-group">
                                 <label for="name"><i class="zmdi zmdi-account material-icons-name"></i></label>
                                 <input type="text" name="name" id="name" placeholder="Your Name" required/>
@@ -41,6 +46,7 @@
                                 <label for="re-pass"><i class="zmdi zmdi-lock-outline"></i></label>
                                 <input type="password" name="confirmpassword" id="confirmpassword" placeholder="Repeat your password" required/>
                             </div>
+                             
                            
                             <div class="form-group form-button">
                                 <input type="submit" name="signup" id="signup" class="form-submit" value="Register"/>
@@ -50,7 +56,20 @@
                     <div class="signup-image">
                         <figure><img src="/images/herd logo.jpg" alt="sing up image"></figure>
                         <a href="signin" class="signup-image-link">I am already member</a>
+                        
+                        <div class="form-group">
+                            <label  class="bmd-label"></label>
+                            <button type="button" class="btn btn-success">Role:</button>
+                      <select name="role" class="custom-select my-select" required>
+                        <option>Choose your role</option>
+                        <option selected>Employee</option>
+                        <option>Supervisor</option>
+                        <option>Line Manager</option>
+                        <option>Admin/HR</option>
+                      </select>
+                        </div>  
                     </div>
+                    
                 </div>
             </div>
         </section>

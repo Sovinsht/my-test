@@ -4,9 +4,12 @@ const Register = require('../model/user');
 const Activity = require('../model/activity');
 const Project = require('../model/project');
 //var activityController= require('../controllers/fetch_data');
+const RegisterData = Register.find({});
 const ActivityData = Activity.find({});
 const ProjectData = Project.find({status:'Enable'});
+const ProjectData1 = Project.find({});
 const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const async = require('async');
 const crypto = require('crypto');
@@ -22,6 +25,7 @@ require('core-js/modules/es.symbol.async-iterator');
 require('regenerator-runtime/runtime');
 const ExcelJs = require('exceljs/dist/es5');
 const moment = require('moment');
+const { errorMonitor } = require('stream');
 
 
 require('dotenv').config();
@@ -33,7 +37,11 @@ require('../app');
 
 //ROute home
 router.get('/', function(req,res) {
-  res.render('home');
+  if(req.session.userEmail){
+  res.render('index');
+  } else{
+    res.render('register');
+  }
 })
 
 
@@ -44,6 +52,11 @@ router.get('/signin', function(req, res) {
   res.render('signin');
 });
 
+//Route: auth/week
+router.get('/week', function(req, res){
+  res.render('week')
+})
+
 router.post('/signin', async(req,res) =>{
  try{
    const email = req.body.email;
@@ -51,13 +64,15 @@ router.post('/signin', async(req,res) =>{
 
     const useremail = await Register.findOne({email:email});
     const isMatch = await bcrypt.compare(password, useremail.password)
+
     if(isMatch){
-      
+      req.session.userEmail=email;
       res.redirect('/index');
      
 
     }else{
-      res.send("Incorrect password Details");
+      res.render('signin',{msg:"Incorrect password Details"});
+      // res.send("Incorrect password Details");
     }
 
  }catch(error) {
@@ -69,7 +84,11 @@ router.post('/signin', async(req,res) =>{
 
 //Route: auth/register
 router.get('/register', function(req, res) {
+  if(req.session.userEmail){
+    res.redirect('./index');
+  } else{
   res.render('register');
+  }
 });
 
 router.post('/register', async(req, res) =>{
@@ -82,7 +101,8 @@ router.post('/register', async(req, res) =>{
         name: req.body.name,
         email: req.body.email,
         password: password,       
-        confirmpassword: cpassword
+        confirmpassword: cpassword,
+        role: req.body.role
       })
 
       
@@ -93,7 +113,7 @@ router.post('/register', async(req, res) =>{
     
       res.redirect('/signin')
     }else {
-      req.flash("Incorrect Password");
+      req.flash("error_msg","Incorrect Password");
     }
   
 
@@ -238,9 +258,21 @@ router.post('/resetpassword/:token', function(req, res){
 
 //Route: auth/activity
 router.get('/index', function(req, res) {
+  
   ActivityData.exec(function(err, data){
     if(err) throw err;
-    res.render('dashboard', {records: data, p_records:data});
+    ProjectData1.exec(function(err, pdata){
+      if(err) throw err;
+      RegisterData.exec(function(err, rdata){
+        if(err) throw err;
+        console.log(rdata);
+        res.render('dashboard', {records: data, p_records: pdata, r_records: rdata});
+      
+      });
+    });
+
+    //console.log(data)
+    
   })
   
 });
@@ -276,14 +308,137 @@ router.post('/project', async(req, res) =>{
 
 //user.edit_activity
 
-// router.get('/edit', function(req, res){
-//    ProjectData.exec(function(err, pdata){
-//     if(err) throw err;
-//     res.render('edit-activity', {p_records: pdata });
+router.get('/editA/:id', function(req, res){
+  
+   ProjectData.exec(function(err, pdata){
+
+    if(err) throw err;
+    Activity.findById(req.params.id, function(err, activity){
+      if(err){
+        console.log(err);
+  
+      } else {
+        console.log(activity);
+        res.render('edit-activity', {activities: activity, p_records: pdata})
+      }
+  
+    });
+    
+  })
+   
+});
+
+//post
+router.post('/editA/:id', function(req, res){
+  console.log("id "+ req.params.id);
+  
+  const mybodydata = {
+   key_activities: req.body.key_activities,
+   project: req.body.project,
+   team_member: req.body.team_member,
+   activity_completion_status: req.body.activity_completion_status,
+   remarks: req.body.remarks
+  }
+  console.log(mybodydata);
+  const id = mongoose.Types.ObjectId(req.params.id);
+  console.log("1" + id);
+  console.log("2" + req.params.id)
+  
+  Activity.findById(req.params.id, function(err, activity){
+    if(err){
+      console.log(err);
+
+    } else {
+      console.log(activity);
+
+      activity.key_activities = req.body.key_activities,
+      activity.project= req.body.project,
+      activity.team_member= req.body.team_member,
+      activity.activity_completion_status= req.body.activity_completion_status,
+      activity.remarks= req.body.remarks
+      activity.save().then(()=> {
+        res.redirect('/index');// Success!
+      }, reason => {
+        res.redirect('/editA/:id ' + req.params.id); // Error!
+      });
+
+      
+    }
+
+  });
+//  Activity.findOneAndUpdate({_id: id}, mybodydata, function(err){
+//      if(err){
+//        console.log(err);
+//        res.redirect('/editA/:id ' + req.params.id);
+//    } else {
+//      res.render('index');
+//     }
 //   })
+})
+
+//edit project
+
+router.get('/editP/:id', function(req, res){
+  Project.findById(req.params.id, function(err, pdata){
+
+   if(err) throw err;
+    else {
+       console.log(pdata);
+       res.render('edit-project', {p_records: pdata})
+     }
+ 
   
+   
+ })
+ 
+ 
+ 
+});
+
+router.post('/editP/:id', function(req, res){
+  console.log("id "+ req.params.id);
   
-// });
+  const myprojectdata = {
+   
+   project: req.body.project,
+   status: req.body.status
+  }
+  console.log(myprojectdata);
+  const id = mongoose.Types.ObjectId(req.params.id);
+  console.log("1" + id);
+  console.log("2" + req.params.id)
+  
+  Project.findById(req.params.id, function(err, project){
+    if(err){
+      console.log(err);
+
+    } else {
+      console.log(project);
+
+      project.project= req.body.project,
+      project.status= req.body.status
+      
+      project.save().then(()=> {
+        res.redirect('/index');// Success!
+      }, reason => {
+        res.redirect('/editP/:id ' + req.params.id); // Error!
+      });
+
+      
+    }
+
+  });
+//  Activity.findOneAndUpdate({_id: id}, mybodydata, function(err){
+//      if(err){
+//        console.log(err);
+//        res.redirect('/editA/:id ' + req.params.id);
+//    } else {
+//      res.render('index');
+//     }
+//   })
+})
+
+
 
 // //user. delete_activity
 
@@ -311,6 +466,7 @@ router.post('/activity', async(req, res) =>{
       project: req.body.project,
       team_member: req.body.team_member,
       activity_completion_status: req.body.activity_completion_status,
+      deadline:req.body.deadline,
       remarks: req.body.remarks
      
          })
@@ -427,26 +583,9 @@ router.post('/activity', async(req, res) =>{
     
 //  });
 
- router.post('/edit/:id', function(req, res){
-   console.log("id"+ req.params.id);
-   const mybodydata = {
-    key_activities: req.body.key_activities,
-    project: req.body.project,
-    team_member: req.body.team_member,
-    activity_completion_status: req.body.activity_completion_status,
-    remarks: req.body.remarks
-   }
+ 
 
-   Activity.findByIdAndUpdate(req.params.id, mybodydata, function(err){
-     if(err){
-       res.redirect('edit-activity' + req.params.id);
-     } else {
-       res.redirect('index');
-     }
-   })
- })
-
-    router.delete('/report', function(req, res){
+    router.delete('/report/:id', function(req, res){
         const delete1 = req.body.id
         console.log(delete1)
         
@@ -456,6 +595,30 @@ router.post('/activity', async(req, res) =>{
         else    res.redirect('/index');
         });
         });
+
+        router.get('/deleteA/:id', function(req, res){
+          var id = req.params.id
+          console.log(id)
+          var del = Activity.findByIdAndDelete(id);
+
+          del.exec(function(err){
+            if(err) throw err;
+            res.redirect('/index')
+          })
+          
+          });
+
+          router.get('/deleteP/:id', function(req, res){
+            var id = req.params.id
+            console.log(id)
+            var del = Project.findByIdAndDelete(id);
+  
+            del.exec(function(err){
+              if(err) throw err;
+              res.redirect('/index')
+            })
+            
+            });
      
 
 

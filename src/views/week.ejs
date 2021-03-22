@@ -55,19 +55,19 @@ The above copyright notice and this permission notice shall be included in all c
               <p>Project </p>
             </a>
           </li>
-          <li class="nav-item active ">
-            <a class="nav-link" href="user">
+          <li class="nav-item  ">
+            <a class="nav-link" href="activity">
               <i class="material-icons">report</i>
               <p>Weekly Report</p>
             </a>
           </li>
           
-          <!-- <li class="nav-item ">
-            <a class="nav-link" href="./tables.html">
+           <li class="nav-item active">
+            <a class="nav-link" href="week">
               <i class="material-icons">content_paste</i>
-              <p>Table List</p>
+              <p>Week</p>
             </a>
-          </li> -->
+          </li> 
           
         </ul>
       </div>
@@ -116,7 +116,7 @@ The above copyright notice and this permission notice shall be included in all c
                   <a class="dropdown-item" href="#">Profile</a>
                   <a class="dropdown-item" href="#">Settings</a>
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="/logout">Log out</a>
+                  <a class="dropdown-item" href="#">Log out</a>
                 </div>
               </li>
             </ul>
@@ -134,37 +134,40 @@ The above copyright notice and this permission notice shall be included in all c
                   <p class="card-category">Complete your Weekly Activities Report</p>
                 </div>
                 <div class="card-body">
-                  <form action="/activity" method="POST" class="activity-form" id="activity-form">
+                  <form action="/week" method="POST" class="activity-form" id="activity-form">
                     <div class="row">
                       <div class="col-md-6">
                         <div class="form-group">
-                          <label class="bmd-label-floating">Key Activities</label>
-                          <input type="text" name="key_activities" class="form-control" required >
+                          <label class="bmd-label-floating">Title</label>
+                          <input type="text" name="title" class="form-control" required >
                         </div>
                       </div>
-                      <div class="col-md-6">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">Project</label>
-                          <select name="project" class="custom-select my-select">
-                            <option>Choose..</option>
-                            <% p_records.forEach(function(rows){ %>
-                              
-                            <option value="<%= rows.project %>"><%= rows.project %></option>
-                            <% }); %>
-                        </select>
-                      
-                        </div>
-                      </div>
-                     
+                                          
                     </div>
                     <div class="row">
-                      <div class="col-md-6">
-                        <div class="form-group">
-                          <label class="bmd-label-floating">Support Team Member</label>
-                         <input type="text" name="team_member" rows="3" class="form-control"  required>
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label>From Date:</label>
+                    <label class="bmd-label-floating"> </label>
+                      <input type="date" name="fromDate" id="fromDate"  class="form-control"  required>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label>To Date:</label>
+                            <label class="bmd-label-floating"> </label>
+                              <input type="date" name="toDate" id="toDate" class="form-control"  required>
+                          </div>
                         </div>
                       </div>
+                    <div class="row">
                       <div class="col-md-6">
+                        <!-- <div class="form-group">
+                          <label class="bmd-label-floating">Support Team Member</label>
+                         <input type="text" name="team_member" rows="3" class="form-control"  required>
+                        </div> -->
+                      </div>
+                      <!-- <div class="col-md-6">
                         <div class="form-group">
                           <label  class="bmd-label-floating">Activity Completion Status</label>
                       <select name="activity_completion_status" class="custom-select my-select">
@@ -177,18 +180,16 @@ The above copyright notice and this permission notice shall be included in all c
                       
                       </select>
                         </div>
-                      </div>
+                      </div> -->
                     </div>
-                     <div class="row">
+                     <!-- <div class="row">
                       <div class="col-md-6">
                         <div class="form-group">
-                          <label>Deadline</label>
-                    <label class="bmd-label-floating"> </label>
-                      <input type="date" name="deadline" class="form-control"  required>
-                          
+                          <label class="bmd-label-floating">Deadline</label>
+                          <input type="date" name="deadline" class="form-control">
                         </div>
                       </div>
-                    </div> 
+                    </div>  -->
                     <!-- <div class="row">
                       <div class="col-md-4">
                         <div class="form-group">
@@ -209,7 +210,7 @@ The above copyright notice and this permission notice shall be included in all c
                         </div>
                       </div>
                     </div>  -->
-                    <div class="row">
+                    <!-- <div class="row">
                       <div class="col-md-12">
                         <div class="form-group">
                           <label>Remarks</label>
@@ -219,7 +220,7 @@ The above copyright notice and this permission notice shall be included in all c
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </div> -->
                     <button type="submit" class="btn btn-primary pull-right">Add Report</button>
                     <div class="clearfix"></div>
                   </form>

@@ -26,6 +26,10 @@ const activityModel = new Schema({
     project: {
         type: String,
         required: true
+      },
+    deadline:{
+        type:String,
+        required:false
       }
     
    }, {timestamps: true}
