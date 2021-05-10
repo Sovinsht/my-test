@@ -17,9 +17,13 @@ const activityModel = new Schema({
     },
     activity_completion_status: {
         type: String,
-        required: true
+        required: false
     },
     remarks: {
+      type: String,
+      required: false
+    },
+    extended_deadline:{
       type: String,
       required: false
     },
@@ -27,9 +31,9 @@ const activityModel = new Schema({
         type: String,
         required: true
       },
-    deadline:{
+    week:{
         type:String,
-        required:false
+        required:true
       }
     
    }, {timestamps: true}

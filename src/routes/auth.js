@@ -2,12 +2,16 @@ const express = require('express');
 const router = express.Router();
 const Register = require('../model/user');
 const Activity = require('../model/activity');
+const Unplanned = require('../model/unplanned');
 const Project = require('../model/project');
+const Week = require('../model/week');
 //var activityController= require('../controllers/fetch_data');
 const RegisterData = Register.find({});
 const ActivityData = Activity.find({});
+const UnplannedData = Unplanned.find({});
 const ProjectData = Project.find({status:'Enable'});
 const ProjectData1 = Project.find({});
+const WeekData = Week.find({});
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
@@ -52,10 +56,18 @@ router.get('/signin', function(req, res) {
   res.render('signin');
 });
 
+router.get('/employee', function(req, res) {
+  res.render('Employee-Detail');
+});
+
+
 //Route: auth/week
 router.get('/week', function(req, res){
-  res.render('week')
+  WeekData.exec(function(err, wdata){
+    if(err) throw err;
+  res.render('week',{w_records:wdata})
 })
+});
 
 router.post('/signin', async(req,res) =>{
  try{
@@ -111,14 +123,14 @@ router.post('/register', async(req, res) =>{
      
     //   console.log("the success part:" + registerUser);
     
-      res.redirect('/signin')
+      res.redirect('/user')
     }else {
       req.flash("error_msg","Incorrect Password");
     }
   
 
   } catch(error){
-    //console.log(`error on token`);
+    console.log('erroor',error);
       res.status(400).send(error);
       
   }
@@ -266,10 +278,16 @@ router.get('/index', function(req, res) {
       RegisterData.exec(function(err, rdata){
         if(err) throw err;
         console.log(rdata);
-        res.render('dashboard', {records: data, p_records: pdata, r_records: rdata});
+       WeekData.exec(function(err, wdata){
+          console.log(wdata);
+          if(err) throw err;
+        
+        res.render('dashboard', {records: data, p_records: pdata, r_records: rdata, w_records: wdata});
       
       });
     });
+  });
+
 
     //console.log(data)
     
@@ -279,7 +297,10 @@ router.get('/index', function(req, res) {
 
 //project
 router.get('/project', function(req, res){
-  res.render('project')
+  ProjectData1.exec(function(err, pdata){
+    if(err) throw err;
+  res.render('project',{p_records: pdata})
+  });
 });
 
 router.post('/project', async(req, res) =>{
@@ -306,6 +327,33 @@ router.post('/project', async(req, res) =>{
   }
 });
 
+//week
+
+router.post('/week', async(req, res) =>{
+  try{
+    const weekReport = new Week({
+      title: req.body.title,
+      fromDate: req.body.fromDate,
+      toDate: req.body.toDate
+     
+    })
+
+    
+
+    const registered = await weekReport.save();
+   
+  //   console.log("the success part:" + registerUser);
+  
+    res.redirect('/week')
+
+
+  } catch(error){
+      console.log(`error on week entry`);
+        res.status(400).send(error);
+
+  }
+});
+
 //user.edit_activity
 
 router.get('/editA/:id', function(req, res){
@@ -313,15 +361,17 @@ router.get('/editA/:id', function(req, res){
    ProjectData.exec(function(err, pdata){
 
     if(err) throw err;
+    ActivityData.exec(function(err, data){
+      if(err) throw err;
     Activity.findById(req.params.id, function(err, activity){
       if(err){
         console.log(err);
   
       } else {
         console.log(activity);
-        res.render('edit-activity', {activities: activity, p_records: pdata})
+        res.render('edit-activity', {records:data, activities: activity, p_records: pdata})
       }
-  
+    });
     });
     
   })
@@ -355,9 +405,10 @@ router.post('/editA/:id', function(req, res){
       activity.project= req.body.project,
       activity.team_member= req.body.team_member,
       activity.activity_completion_status= req.body.activity_completion_status,
+      activity.extended_deadline = req.body.extended_deadline,
       activity.remarks= req.body.remarks
       activity.save().then(()=> {
-        res.redirect('/index');// Success!
+        res.redirect('/activity');// Success!
       }, reason => {
         res.redirect('/editA/:id ' + req.params.id); // Error!
       });
@@ -376,20 +427,87 @@ router.post('/editA/:id', function(req, res){
 //   })
 })
 
+//user.edit_activity_B
+
+router.get('/editB/:id', function(req, res){
+  
+  ProjectData.exec(function(err, pdata){
+
+   if(err) throw err;
+   Activity.findById(req.params.id, function(err, activity){
+     if(err){
+       console.log(err);
+ 
+     } else {
+       console.log(activity);
+       res.render('edit-activity B', {activities: activity, p_records: pdata})
+     }
+ 
+   });
+   
+ })
+  
+});
+
+//post
+router.post('/editB/:id', function(req, res){
+ console.log("id "+ req.params.id);
+ 
+ const mybodydata = {
+  key_activities: req.body.key_activities,
+  project: req.body.project,
+  team_member: req.body.team_member,
+  activity_completion_status: req.body.activity_completion_status,
+  remarks: req.body.remarks
+ }
+ console.log(mybodydata);
+ const id = mongoose.Types.ObjectId(req.params.id);
+ console.log("1" + id);
+ console.log("2" + req.params.id)
+ 
+ Activity.findById(req.params.id, function(err, activity){
+   if(err){
+     console.log(err);
+
+   } else {
+     console.log(activity);
+
+    //  activity.key_activities = req.body.key_activities,
+    //  activity.project= req.body.project,
+    //  activity.team_member= req.body.team_member,
+     activity.activity_completion_status= req.body.activity_completion_status,
+
+    //  activity.remarks= req.body.remarks
+     activity.save().then(()=> {
+       res.redirect('/index');// Success!
+     }, reason => {
+       res.redirect('/editB/:id ' + req.params.id); // Error!
+     });
+
+     
+   }
+
+ });
+
+});
+
+
 //edit project
 
 router.get('/editP/:id', function(req, res){
-  Project.findById(req.params.id, function(err, pdata){
+  ProjectData1.exec(function(err, pdata){
+    if(err) throw err;
+  Project.findById(req.params.id, function(err, project){
 
    if(err) throw err;
     else {
        console.log(pdata);
-       res.render('edit-project', {p_records: pdata})
+       res.render('edit-project', {p_records: pdata, projects:project})
      }
  
-  
+    });
    
- })
+ });
  
  
  
@@ -419,7 +537,7 @@ router.post('/editP/:id', function(req, res){
       project.status= req.body.status
       
       project.save().then(()=> {
-        res.redirect('/index');// Success!
+        res.redirect('/project');// Success!
       }, reason => {
         res.redirect('/editP/:id ' + req.params.id); // Error!
       });
@@ -439,7 +557,150 @@ router.post('/editP/:id', function(req, res){
 })
 
 
+//week
 
+
+router.get('/editW/:id', function(req, res){
+  WeekData.exec(function(err, wdata){
+    if(err) throw err;
+  Week.findById(req.params.id, function(err, week){
+
+   if(err) throw err;
+    else {
+       console.log(week);
+       res.render('edit-week', {w_records: wdata, weeks:week})
+     }
+ 
+    });
+   
+ });
+ 
+ 
+ 
+});
+
+router.post('/editW/:id', function(req, res){
+  console.log("id "+ req.params.id);
+  
+  const myprojectdata = {
+   
+    title: req.body.title,
+    fromDate: req.body.fromDate,
+    toDate: req.body.toDate
+  }
+  console.log(myprojectdata);
+  const id = mongoose.Types.ObjectId(req.params.id);
+  console.log("1" + id);
+  console.log("2" + req.params.id)
+  
+  Week.findById(req.params.id, function(err, week){
+    if(err){
+      console.log(err);
+
+    } else {
+      console.log(week);
+
+      week.title= req.body.title,
+      week.fromDate= req.body.fromDate,
+      week.toDate= req.body.toDate
+      
+      week.save().then(()=> {
+        res.redirect('/week');// Success!
+      }, reason => {
+        res.redirect('/editW/:id ' + req.params.id); // Error!
+      });
+
+      
+    }
+
+  });
+//  Activity.findOneAndUpdate({_id: id}, mybodydata, function(err){
+//      if(err){
+//        console.log(err);
+//        res.redirect('/editA/:id ' + req.params.id);
+//    } else {
+//      res.render('index');
+//     }
+//   })
+})
+
+
+//plan
+
+router.get('/editPlan/:id', function(req, res){
+  
+  ProjectData.exec(function(err, pdata){
+
+    ActivityData.exec(function(err, data){
+      if(err) throw err;
+    ProjectData.exec(function(err, pdata){
+      if(err) throw err;
+      WeekData.exec(function(err, wdata){
+        if(err) throw err;
+        Activity.findById(req.params.id, function(err, plan){
+          if(err){
+            console.log(err);
+      
+          } else {
+            console.log(plan);
+            res.render('edit-plan', {p_records: pdata,records: data, w_records: wdata, plans:plan})
+          }
+        });  
+        })
+    })
+  })
+  }) 
+   
+});
+  
+
+
+//post
+router.post('/editPlan/:id', function(req, res){
+ console.log("id "+ req.params.id);
+ 
+ const mybodydata = {
+  key_activities: req.body.key_activities,
+  project: req.body.project,
+  team_member: req.body.team_member,
+  week: req.body.week
+ 
+ }
+ console.log(mybodydata);
+ const id = mongoose.Types.ObjectId(req.params.id);
+ console.log("1" + id);
+ console.log("2" + req.params.id)
+ 
+ Activity.findById(req.params.id, function(err, plans){
+   if(err){
+     console.log(err);
+
+   } else {
+     console.log(plans);
+
+     plans.key_activities= req.body.key_activities,
+     plans.project= req.body.project,
+     plans.team_member= req.body.team_member,
+     plans.week= req.body.week
+     plans.save().then(()=> {
+       res.redirect('/plan');// Success!
+     }, reason => {
+       res.redirect('/editPlan/:id ' + req.params.id); // Error!
+     });
+
+     
+   }
+
+ });
+//  Activity.findOneAndUpdate({_id: id}, mybodydata, function(err){
+//      if(err){
+//        console.log(err);
+//        res.redirect('/editA/:id ' + req.params.id);
+//    } else {
+//      res.render('index');
+//     }
+//   })
+})
 // //user. delete_activity
 
 // router.get('/delete', function(req, res){
@@ -451,22 +712,70 @@ router.post('/editP/:id', function(req, res){
 
 //user.activity
 
-router.get('/activity', function(req,res){
+router.get('/plan', function(req,res){
+  ActivityData.exec(function(err, data){
+    if(err) throw err;
   ProjectData.exec(function(err, pdata){
     if(err) throw err;
-    res.render('activity', {p_records: pdata});
+    WeekData.exec(function(err, wdata){
+      if(err) throw err;
+    res.render('plan', {p_records: pdata,records: data, w_records: wdata});
   })
-  
+})
+}) 
+})
+
+router.post('/plan', async(req, res) =>{
+  try{
+   const planReport = new Activity({
+       key_activities: req.body.key_activities,
+       project: req.body.project,
+       team_member: req.body.team_member,
+       week: req.body.week,
+      
+      
+          })
+          const reported = await planReport.save();
+            
+    console.log("the success part:" + planReport);
+     
+      res.redirect('plan');
+    
+   
+ 
+     } catch(error){
+      
+      console.log(`error on data entry`, error);
+        res.status(400).send(error);
+       
+    }
+  });
+
+router.get('/activity', function(req,res){
+  ActivityData.exec(function(err, data){
+    if(err) throw err;
+  ProjectData.exec(function(err, pdata){
+    if(err) throw err;
+    UnplannedData.exec(function(err, undata){
+      if(err) throw err;
+    WeekData.exec(function(err, wdata){
+      if(err) throw err;
+    res.render('activity', {p_records: pdata,records: data, w_records: wdata, un_records: undata});
+  })
+});
+})
+}) 
 })
 
 router.post('/activity', async(req, res) =>{
  try{
   const activityReport = new Activity({
+
       key_activities: req.body.key_activities,
       project: req.body.project,
       team_member: req.body.team_member,
       activity_completion_status: req.body.activity_completion_status,
-      deadline:req.body.deadline,
+      week: req.body.week,
       remarks: req.body.remarks
      
          })
@@ -603,7 +912,7 @@ router.post('/activity', async(req, res) =>{
 
           del.exec(function(err){
             if(err) throw err;
-            res.redirect('/index')
+            res.redirect('/activity')
           })
           
           });
@@ -615,17 +924,190 @@ router.post('/activity', async(req, res) =>{
   
             del.exec(function(err){
               if(err) throw err;
-              res.redirect('/index')
+              res.redirect('/project')
             })
             
             });
+
+            router.get('/deleteW/:id', function(req, res){
+              var id = req.params.id
+              console.log(id)
+              var del = Week.findByIdAndDelete(id);
+    
+              del.exec(function(err){
+                if(err) throw err;
+                res.redirect('/week')
+              })
+              
+              });
      
+              router.get('/deletePlan/:id', function(req, res){
+                var id = req.params.id
+                console.log(id)
+                var del = Activity.findByIdAndDelete(id);
+      
+                del.exec(function(err){
+                  if(err) throw err;
+                  res.redirect('/plan')
+                })
+                
+                });
+
+                router.get('/deleteUnplan/:id', function(req, res){
+                  var id = req.params.id
+                  console.log(id)
+                  var del = Unplanned.findByIdAndDelete(id);
+        
+                  del.exec(function(err){
+                    if(err) throw err;
+                    res.redirect('/unplanned')
+                  })
+                  
+                  });
+
+//Route: auth/forget-password
+router.get('/plan', function(req, res, next ){
+  res.render('plan')
+ })
+ 
+ router.get('/note', function(req, res, next ){
+  res.render('note')
+ })
+
+ router.get('/calendar', function(req, res, next ){
+  res.render('calendar')
+ })
+ router.get('/calendar1', function(req, res, next ){
+  res.render('calendar1')
+ })
+
+ router.get('/calendar2', function(req, res, next ){
+  res.render('calendar2')
+ })
+ 
+ 
+
+ router.get('/user', function(req, res, next ){
+  RegisterData.exec(function(err, data){
+    if(err) throw err;
+  res.render('user',{u_record:data})
+ })
+})
+ 
+ //unplanned
+
+ router.get('/unplanned', function(req,res){
+  UnplannedData.exec(function(err, data){
+    if(err) throw err;
+  ProjectData.exec(function(err, pdata){
+    if(err) throw err;
+    WeekData.exec(function(err, wdata){
+      if(err) throw err;
+    res.render('unplanned', {p_records: pdata,records: data, w_records: wdata});
+  })
+})
+}) 
+})
+
+router.post('/unplanned', async(req, res) =>{
+  try{
+   const unplanReport = new Unplanned({
+       key_activities: req.body.key_activities,
+       project: req.body.project,
+       team_member: req.body.team_member,
+       week: req.body.week,
+      
+      
+          })
+          const reported = await unplanReport.save();
+            
+    console.log("the success part:" + unplanReport);
+     
+      res.redirect('unplanned');
+    
+   
+ 
+     } catch(error){
+      
+      console.log(`error on data entry in unplanned`, error);
+        res.status(400).send(error);
+       
+    }
+  });
+
+  
+router.get('/editUnplan/:id', function(req, res){
+  
+  ProjectData.exec(function(err, pdata){
+
+    UnplannedData.exec(function(err, data){
+      if(err) throw err;
+    ProjectData.exec(function(err, pdata){
+      if(err) throw err;
+      WeekData.exec(function(err, wdata){
+        if(err) throw err;
+        Unplanned.findById(req.params.id, function(err, unplan){
+          if(err){
+            console.log(err);
+      
+          } else {
+            console.log(unplan);
+            res.render('edit-unplan', {p_records: pdata,un_records: data, w_records: wdata, unplans:unplan})
+          }
+        });  
+        })
+    })
+  })
+  }) 
+   
+});
+  
 
 
+//post
+router.post('/editUnplan/:id', function(req, res){
+ console.log("id "+ req.params.id);
+ 
+ const mybodydata = {
+  key_activities: req.body.key_activities,
+  project: req.body.project,
+  team_member: req.body.team_member,
+  week: req.body.week
+ 
+ }
+ console.log(mybodydata);
+ const id = mongoose.Types.ObjectId(req.params.id);
+ console.log("1" + id);
+ console.log("2" + req.params.id)
+ 
+ Unplanned.findById(req.params.id, function(err, unplans){
+   if(err){
+     console.log(err);
 
+   } else {
+     console.log(unplans);
 
+     unplans.key_activities= req.body.key_activities,
+     unplans.project= req.body.project,
+     unplans.team_member= req.body.team_member,
+     unplans.week= req.body.week
+     unplans.save().then(()=> {
+       res.redirect('/unplanned');// Success!
+     }, reason => {
+       res.redirect('/editUnplan/:id ' + req.params.id); // Error!
+     });
 
+     
+   }
 
-module.exports =  router
-
-
+ });
+//  Activity.findOneAndUpdate({_id: id}, mybodydata, function(err){
+//      if(err){
+//        console.log(err);
+//        res.redirect('/editA/:id ' + req.params.id);
+//    } else {
+//      res.render('index');
+//     }
+//   })
+})
+module.exports =  router;

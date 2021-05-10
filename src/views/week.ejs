@@ -28,6 +28,7 @@ The above copyright notice and this permission notice shall be included in all c
   <link href="../assets/css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
   <!-- CSS Just for demo purpose, don't include it in your project -->
   <link href="../assets/demo/demo.css" rel="stylesheet" />
+  <script src="../public/javascripts/bootstable.min.js"></script>
 </head>
 
 <body class="">
@@ -38,12 +39,12 @@ The above copyright notice and this permission notice shall be included in all c
 
         Tip 2: you can also add an image using data-image tag
     -->
-      <div class="logo"><a href="http://www.herdint.com" class="simple-text logo-normal">
+      <div class="logo"><a href="index" class="simple-text logo-normal">
           Herd International
         </a></div>
       <div class="sidebar-wrapper">
         <ul class="nav">
-          <li class="nav-item  ">
+          <li class="nav-item   ">
             <a class="nav-link" href="index">
               <i class="material-icons">dashboard</i>
               <p>Dashboard</p>
@@ -55,20 +56,44 @@ The above copyright notice and this permission notice shall be included in all c
               <p>Project </p>
             </a>
           </li>
-          <li class="nav-item  ">
-            <a class="nav-link" href="activity">
-              <i class="material-icons">report</i>
-              <p>Weekly Report</p>
-            </a>
-          </li>
-          
-           <li class="nav-item active">
+          <li class="nav-item active">
             <a class="nav-link" href="week">
               <i class="material-icons">content_paste</i>
               <p>Week</p>
             </a>
-          </li> 
-          
+          </li>
+          <li class="nav-item ">
+            <a class="nav-link" href="plan">
+              <i class="material-icons">library_books</i>
+              <p>Plan</p>
+            </a>
+          </li>
+          <li class="nav-item ">
+            <a class="nav-link" href="activity">
+              <i class="material-icons">report</i>
+              <p>Activities</p>
+            </a>
+          </li>
+         
+           
+          <li class="nav-item ">
+            <a class="nav-link" href="unplanned">
+              <i class="material-icons">bubble_chart</i>
+              <p>Unplanned</p>
+            </a>
+          </li>
+          <li class="nav-item ">
+            <a class="nav-link" href="user">
+              <i class="material-icons">person_add_alt_1 </i>
+              <p>User</p>
+            </a>
+          </li>
+          <li class="nav-item ">
+            <a class="nav-link" href="note">
+              <i class="material-icons">help_outline</i>
+              <p>Help</p>
+            </a>
+          </li>
         </ul>
       </div>
     </div>
@@ -135,6 +160,46 @@ The above copyright notice and this permission notice shall be included in all c
                 </div>
                 <div class="card-body">
                   <form action="/week" method="POST" class="activity-form" id="activity-form">
+                    
+                    
+                        
+                        <div class="table-responsive">
+                          <table class="table table-striped table-bordered "  id="myTable">
+                            <thead>
+                              <tr class="bg-dark text-white">
+                                <th scope="col">Week</th>
+                                <th scope="col">From</th>
+                                <th scope="col">To</th>
+                                
+                                
+                                
+                                <th scope="col">Action</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <% w_records.forEach(function(row){ %>
+                              <tr>
+                                <th scope="row"><%= row.title %></th>
+                                <td><%= row.fromDate %></td>
+                                <!-- <td><%= row.team_member %></td> -->
+                                <td><%= row.toDate %></td> 
+                               
+                               
+                                <td>
+                                 
+                                  <a href="/editW/<%= row.id %>" class="edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
+                                  <!-- <a href="#myModal"   class="text-danger" title="Delete" data-toggle="modal"><i class="material-icons">&#xE872;</i></a> -->
+                                  <a href="/deleteW/<%= row.id %>" class="text-danger" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                                </td>
+                              </tr>
+                              <% }) %>
+                              
+                            </tbody>
+                          </table>
+                         
+                        </div>
+                        </div>
+                        </div>
                     <div class="row">
                       <div class="col-md-6">
                         <div class="form-group">
@@ -233,6 +298,27 @@ The above copyright notice and this permission notice shall be included in all c
     </div>
   </div>
  <!--   Core JS Files   -->
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+ <script type="text/javascript" src="./tableManager.js"></script>
+	<script type="text/javascript">
+		// basic usage
+		$('#myTable').tablemanager({
+			firstSort: [[3,0],[2,0],[1,'asc']],
+			disable: ["last"],
+			appendFilterby: true,
+			dateFormat: [[4,"mm-dd-yyyy"]],
+			debug: true,
+			vocabulary: {
+    voc_filter_by: 'Filter By',
+    voc_type_here_filter: 'Filter...',
+    voc_show_rows: 'Rows Per Page'
+  },
+			pagination: true,
+			showrows: [5,10,20,50,100],
+			disableFilterBy: []
+		});
+		// $('.tablemanager').tablemanager();
+	</script>
  <script src="../assets/js/core/jquery.min.js"></script>
  <script src="../assets/js/core/popper.min.js"></script>
  <script src="../assets/js/core/bootstrap-material-design.min.js"></script>

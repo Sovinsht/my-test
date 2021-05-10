@@ -41,36 +41,47 @@ The above copyright notice and this permission notice shall be included in all c
       <div class="logo"><a href="index" class="simple-text logo-normal">
           Herd International
         </a></div>
-      <div class="sidebar-wrapper">
-        <ul class="nav">
-          <li class="nav-item  ">
-            <a class="nav-link" href="http://localhost:5000/index">
-              <i class="material-icons">dashboard</i>
-              <p>Dashboard</p>
-            </a>
-          </li>
-          <li class="nav-item  ">
-            <a class="nav-link" href="http://localhost:5000/project">
-              <i class="material-icons">project</i>
-              <p>Project </p>
-            </a>
-          </li>
-          <li class="nav-item active ">
-            <a class="nav-link" href="#">
-              <i class="material-icons">report</i>
-              <p>Weekly Report Update</p>
-            </a>
-          </li>
-         
-          <!-- <li class="nav-item ">
-            <a class="nav-link" href="./tables.html">
-              <i class="material-icons">content_paste</i>
-              <p>Table List</p>
-            </a>
-          </li> -->
-          
-        </ul>
-      </div>
+        <div class="sidebar-wrapper">
+          <ul class="nav">
+            <li class="nav-item  ">
+              <a class="nav-link" href="http://localhost:9000/index">
+                <i class="material-icons">dashboard</i>
+                <p>Dashboard</p>
+              </a>
+            </li>
+            <li class="nav-item  ">
+              <a class="nav-link" href="http://localhost:9000/project">
+                <i class="material-icons">report</i>
+                <p>Project </p>
+              </a>
+            </li>
+            <li class="nav-item active ">
+              <a class="nav-link" href="#">
+                <i class="material-icons">report</i>
+                <p>Edit Acivities</p>
+              </a>
+            </li>
+            <li class="nav-item ">
+              <a class="nav-link" href="http://localhost:9000/week">
+                <i class="material-icons">content_paste</i>
+                <p>Week</p>
+              </a>
+            </li>
+            <li class="nav-item ">
+              <a class="nav-link" href="http://localhost:9000/plan">
+                <i class="material-icons">content_paste</i>
+                <p>Plan</p>
+              </a>
+            </li>
+            <li class="nav-item ">
+              <a class="nav-link" href="http://localhost:9000/user">
+                <i class="material-icons">bubble_chart</i>
+                <p>User</p>
+              </a>
+            </li>
+            
+          </ul>
+        </div>
     </div>
     <div class="main-panel">
       <!-- Navbar -->
@@ -135,17 +146,71 @@ The above copyright notice and this permission notice shall be included in all c
                 </div>
                 <div class="card-body">
                   <form action="/editA/<%= activities.id %>" method="POST" class="activity-form" id="activity-form">
+                   
+                    <div class="row">
+                      <div class="col-md-12">
+                       <p><h3 class="text-left mb-3">Weekly Activities Report</h3></p>
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            
+                        
+                          </div>
+                        </div>
+          
+                        
+                        <div class="table-responsive">
+                          <table class="table table-striped table-bordered ">
+                            <thead>
+                              <tr class="bg-dark text-white">
+                                <th scope="col">Key Activities</th>
+                                <th scope="col">Project</th>
+                                <!-- <th scope="col">Team Member</th> -->
+                                <!-- <th scope="col-">Deadline</th> -->
+                                <th scope="col">Activity Completion Status</th>
+                                <th scope="col">Extended Deadline</th>
+                                <th scope="col">Remarks</th>
+                                
+                                <th scope="col">Action</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <% records.forEach(function(row){ %>
+                              <tr>
+                                <th scope="row"><%= row.key_activities %></th>
+                                <td><%= row.project %></td>
+                                <!-- <td><%= row.team_member %></td> -->
+                                <!-- <td><%= row.deadline %></td>  -->
+                                <td><%= row.activity_completion_status %></td> 
+                                <td><%= row.extended_deadline %></td> 
+                                <td><%= row.remarks %></td>
+                                <td>
+                                 
+                                  <a href="/editA/<%= row.id %>" class="edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
+                                  <!-- <a href="#myModal"   class="text-danger" title="Delete" data-toggle="modal"><i class="material-icons">&#xE872;</i></a> -->
+                                  <a href="/deleteA/<%= row.id %>" class="text-danger" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                                </td>
+                              </tr>
+                              <% }) %>
+                              
+                            </tbody>
+                          </table>
+                          <a href="http://localhost:9000/activity"  class="btn btn-primary pull-right">Back</a>
+                        </div>
+                        </div>
+                        </div>
+                        
                     <div class="row">
                       <div class="col-md-6">
                         <div class="form-group">
                           <label class="bmd-label-floating">Key Activities</label>
-                          <input type="text" name="key_activities" class="form-control" value="<%= activities.key_activities %>" required >
+                          <input type="text" name="key_activities" class="form-control" value="<%= activities.key_activities %>" required readonly>
                         </div>
                       </div>
                       <div class="col-md-6">
                         <div class="form-group">
                           <label class="bmd-label-floating">Project</label>
-                          <select  name="project" class="custom-select my-select">
+                          <select  name="project" class="custom-select my-select" >
+                            <option value="<%= activities.project %>"><%= activities.project %></option>
                             <option>Choose..</option>
                             <% p_records.forEach(function(rows){ %>
                               
@@ -161,14 +226,14 @@ The above copyright notice and this permission notice shall be included in all c
                       <div class="col-md-6">
                         <div class="form-group">
                           <label class="bmd-label-floating">Support Team Member</label>
-                         <input type="text" name="team_member" rows="3" class="form-control" value="<%= activities.team_member %>"  required>
+                         <input type="text" name="team_member" rows="3" class="form-control" value="<%= activities.team_member %>"   required>
                         </div>
                       </div>
                       <div class="col-md-6">
                         <div class="form-group">
                           <label  class="bmd-label-floating">Activity Completion Status</label>
                       <select name="activity_completion_status"  class="custom-select my-select">
-                        
+                        <option></option>
                         <option >Choose..</option>
                         <option value="Fully" <% if( activities.activity_completion_status == "Fully"){ %> selected <% } %>>Fully</option>
                         <option value="Partially"  <% if( activities.activity_completion_status == "Partially"){ %> selected <% } %>>Partially</option>
@@ -180,14 +245,15 @@ The above copyright notice and this permission notice shall be included in all c
                         </div>
                       </div>
                     </div>
-                    <!-- <div class="row">
-                      <div class="col-md-12">
+                    <div class="row">
+                      <div class="col-md-6">
                         <div class="form-group">
-                          <label class="bmd-label-floating">Extended Deadline</label>
-                          <input type="date" class="form-control">
+                          <label>Extended Deadline:</label>
+                          <label class="bmd-label-floating"> </label>
+                            <input type="date" name="extended_deadline" id="extended_deadline" class="form-control"  >
                         </div>
                       </div>
-                    </div> -->
+                    </div>
                     <!-- <div class="row">
                       <div class="col-md-4">
                         <div class="form-group">
@@ -214,7 +280,7 @@ The above copyright notice and this permission notice shall be included in all c
                           <label>Remarks</label>
                           <div class="form-group">
                             <label class="bmd-label-floating"> </label>
-                            <input type="text" name="remarks" rows="3" class="form-control" value="<%= activities.remarks %>"  required>
+                            <input type="text" name="remarks" rows="3" class="form-control" value="<%= activities.reason %>"  >
                             
                           </div>
                         </div>

@@ -44,7 +44,7 @@ The above copyright notice and this permission notice shall be included in all c
       <div class="sidebar-wrapper">
         <ul class="nav">
           <li class="nav-item  ">
-            <a class="nav-link" href="http://localhost:5000/index">
+            <a class="nav-link" href="http://localhost:9000/index">
               <i class="material-icons">dashboard</i>
               <p>Dashboard</p>
             </a>
@@ -55,13 +55,45 @@ The above copyright notice and this permission notice shall be included in all c
               <p>Project Update </p>
             </a>
           </li>
-          <li class="nav-item  ">
-            <a class="nav-link" href="http://localhost:5000/activity">
-              <i class="material-icons">report</i>
-              <p>Weekly Report </p>
+          
+          <li class="nav-item ">
+            <a class="nav-link" href="http://localhost:9000/week">
+              <i class="material-icons">content_paste</i>
+              <p>Week</p>
             </a>
           </li>
-          
+          <li class="nav-item ">
+            <a class="nav-link" href="http://localhost:9000/plan">
+              <i class="material-icons">library_books</i>
+              <p>Plan</p>
+            </a>
+          </li>
+          <li class="nav-item ">
+            <a class="nav-link" href="http://localhost:9000/activity">
+              <i class="material-icons">report</i>
+              <p>Activities</p>
+            </a>
+          </li>
+         
+           
+          <li class="nav-item ">
+            <a class="nav-link" href="http://localhost:9000/unplanned">
+              <i class="material-icons">bubble_chart</i>
+              <p>Unplanned</p>
+            </a>
+          </li>
+          <li class="nav-item ">
+            <a class="nav-link" href="http://localhost:9000/user">
+              <i class="material-icons">person_add_alt_1 </i>
+              <p>User</p>
+            </a>
+          </li>
+          <li class="nav-item ">
+            <a class="nav-link" href="http://localhost:9000/note">
+              <i class="material-icons">help_outline</i>
+              <p>Help</p>
+            </a>
+          </li>
           <!-- <li class="nav-item ">
             <a class="nav-link" href="./tables.html">
               <i class="material-icons">content_paste</i>
@@ -134,12 +166,16 @@ The above copyright notice and this permission notice shall be included in all c
                   <p class="card-category">Edit Project</p>
                 </div>
                 <div class="card-body">
-                  <form action="/editP/<%= p_records.id %>" method="POST" class="activity-form" id="activity-form">
+                  <form action="/editP/<%= projects.id %>" method="POST" class="activity-form" id="activity-form">
+                   
+                    
+                    
+                    <a href="http://localhost:9000/project"  class="btn btn-primary pull-right">Back</a>
                     <div class="row">
                       <div class="col-md-6">
                         <div class="form-group">
                           <label class="bmd-label-floating">Project</label>
-                          <input type="text" value="<%= p_records.project %>" name="project" class="form-control" required >
+                          <input type="text" value="<%= projects.project %>" name="project" class="form-control" required >
                           <%= console.log(p_records.project) %>
                         </div>
                       </div>
@@ -150,10 +186,10 @@ The above copyright notice and this permission notice shall be included in all c
                         <div class="form-group">
                           <label class="bmd-label-floating">Please select:</label>
                           <select  name="status" class="custom-select my-select" required>
-                            <option value="<%= p_records.status %>"></option>
+                            <option value="<%= projects.status %>"></option>
                             <option>Choose..</option>
-                            <option value="Enable"<% if( p_records.status == "Enable"){ %> selected <% } %>>Enable</option>
-                            <option value="Disable"<% if( p_records.status == "Disable"){ %> selected <% } %>>Disable</option>
+                            <option value="Enable"<% if( projects.status == "Enable"){ %> selected <% } %>>Enable</option>
+                            <option value="Disable"<% if( projects.status == "Disable"){ %> selected <% } %>>Disable</option>
                                                      
                           </select>
 
@@ -255,6 +291,7 @@ The above copyright notice and this permission notice shall be included in all c
     </div>
   </div>
  <!--   Core JS Files   -->
+ 
  <script src="../assets/js/core/jquery.min.js"></script>
  <script src="../assets/js/core/popper.min.js"></script>
  <script src="../assets/js/core/bootstrap-material-design.min.js"></script>
@@ -294,6 +331,8 @@ The above copyright notice and this permission notice shall be included in all c
  <script src="../assets/js/material-dashboard.js?v=2.1.2" type="text/javascript"></script>
  <!-- Material Dashboard DEMO methods, don't include it in your project! -->
  <script src="../assets/demo/demo.js"></script>
+ <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
   <script>
     $(document).ready(function() {
       $().ready(function() {
